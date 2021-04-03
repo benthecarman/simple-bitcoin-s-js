@@ -1,14 +1,16 @@
 package org.bitcoins.simple
+/*
 import org.bitcoins.core.config.TestNet3
 import org.bitcoins.core.protocol.BitcoinAddress
 import org.bitcoins.core.protocol.script.P2WPKHWitnessSPKV0
 import org.bitcoins.crypto.ECPrivateKey
 import org.scalajs.dom
 import org.scalajs.dom.document
+*/
 
 object BitcoinSExample {
 
-  def main(args: Array[String]): Unit = {
+/*  def main(args: Array[String]): Unit = {
     appendPar(document.body, "Hello World")
     val privKey = ECPrivateKey.freshPrivateKey
     val publicKey =  privKey.publicKey
@@ -27,5 +29,5 @@ object BitcoinSExample {
     val parNode = document.createElement("p")
     parNode.textContent = text
     targetNode.appendChild(parNode)
-  }
+  }*/
 }
