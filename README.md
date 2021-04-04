@@ -16,3 +16,4 @@ output on the webpage.
 
 > firefox scala-js-tutorial-fastopt.html
 
+![Alt text](Screenshot%20from%202021-04-04%2009-15-56.png "a title")
