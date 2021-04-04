@@ -4,12 +4,15 @@ This project is to provide a simple html page that displays bitcoin-s data struc
 
 The Scala file to modify to test things out is [BitcoinSExample](src/main/scala/org/bitcoins/simple/BitcoinSExample.scala)
 
-The `sbt fastLinkJS` command will generate the file `scala-js-tutorial-fastopt.html`
+> sbt fastOptJS::webpack
 
-> sbt fastLinkJS
+This will generate a javascript file located at `target/scala-2.13/scalajs-bundler/main/scala-js-tutorial-fastopt-bundle.js`
+
+This javascript file is referenced inside of [`scala-js-tutorial-fastopt.html`](scala-js-tutorial-fastopt.html)
+
+
+You can now start the webpage with your favorite web browser and see a private key, public key, scriptpubkey and bitcoin address
+output on the webpage.
 
 > firefox scala-js-tutorial-fastopt.html
-
-More generally, you just need to open up `scala-js-tutorial-fastopt.html` in a browser after running `fastLinkJS`.
-
 
