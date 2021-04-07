@@ -1,51 +1,80 @@
 package org.bitcoins.simple
-import org.bitcoins.core.config.TestNet3
-import org.bitcoins.core.protocol.{Bech32Address, P2PKHAddress}
-import org.bitcoins.core.protocol.script.P2WPKHWitnessSPKV0
-import org.bitcoins.crypto.ECPrivateKey
+
+import org.bitcoins.core.currency.Satoshis
+import org.bitcoins.core.protocol.dlc.{CallOption, RoundingIntervals}
 import org.scalajs.dom
-import org.scalajs.dom.document
+import org.scalajs.dom.html.Input
+import org.scalajs.dom.{document, Element}
 
 import scala.scalajs.js.annotation.JSExportTopLevel
 
-/**
- * This creates a simple single page webapp that loads private keys/bitcoin addreses
- * This script can be run with
- *
- * >fastOptJS::webpack
- *
- * This will generate a javascript file that is located at
- * target/scala-2.13/scalajs-bundler/main/scala-js-tutorial-fastopt-bundle.js
- *
- * This javascript file is referenced by the file scala-js-tutorial-fastopt.html
- *
- * After building the javascript file, you can open the html file with your
- * favorite web browser and see private keys and addresses generated
- *
- * This javascript file is linked inside of
- * Most of the structural code is cribbed from the scalajs tutorial
- *
- * @see http://www.scala-js.org/doc/tutorial/basic/
- */
 object BitcoinSExample {
 
   def main(args: Array[String]): Unit = {
-    appendPar(document.body, "Hello World")
+    appendPar(document.body, "DLC Templates")
+    appendPar(document.body, "Call Option")
 
-    //load some keys/addresses on page load
-    generateAddress()
+    val individualCollateral = document.createElement("label")
+    individualCollateral.textContent = "Individual Collateral"
+    val individualCollateralText =
+      document.createElement("input").asInstanceOf[Input]
+    document.body.appendChild(individualCollateral)
+    document.body.appendChild(individualCollateralText)
+    document.body.appendChild(document.createElement("br"))
+
+    val totalCollateral = document.createElement("label")
+    totalCollateral.textContent = "Total Collateral"
+    val totalCollateralText = document.createElement("input")
+    document.body.appendChild(totalCollateral)
+    document.body.appendChild(totalCollateralText)
+    document.body.appendChild(document.createElement("br"))
+
+    val premium = document.createElement("label")
+    premium.textContent = "Premium"
+    val premiumText = document.createElement("input")
+    document.body.appendChild(premium)
+    document.body.appendChild(premiumText)
+    document.body.appendChild(document.createElement("br"))
+
+    val numDigits = document.createElement("label")
+    numDigits.textContent = "Num Digits"
+    val numDigitsText = document.createElement("input")
+    document.body.appendChild(numDigits)
+    document.body.appendChild(numDigitsText)
+    document.body.appendChild(document.createElement("br"))
+
+    val strikePrice = document.createElement("label")
+    strikePrice.textContent = "Strike Price"
+    val strikePriceText = document.createElement("input")
+    document.body.appendChild(strikePrice)
+    document.body.appendChild(strikePriceText)
+    document.body.appendChild(document.createElement("br"))
+
+    val resultArea = document.createElement("textarea")
 
     //add a button to add more keys/addresses on demand
-    val button = document.createElement("button")
-    button.textContent = "Click me to generate more keys/addresses!"
+    val create = document.createElement("button")
+    create.textContent = "Create Descriptor"
 
     //when the button is clicked call the generateAddress function
-    button.addEventListener("click", { (e: dom.MouseEvent) =>
-      generateAddress()
-    })
+    create.addEventListener(
+      "click",
+      { (_: dom.MouseEvent) =>
+        generateDescriptor(
+          individualCollateralText = individualCollateralText,
+          totalCollateralText = totalCollateralText.asInstanceOf[Input],
+          premiumText = premiumText.asInstanceOf[Input],
+          numDigitsText = numDigitsText.asInstanceOf[Input],
+          strikePriceText = strikePriceText.asInstanceOf[Input],
+          resultArea = resultArea
+        )
+      }
+    )
 
     //add the actual button to the page
-    document.body.appendChild(button)
+    document.body.appendChild(create)
+    document.body.appendChild(document.createElement("br"))
+    document.body.appendChild(resultArea)
     ()
   }
 
@@ -55,18 +84,31 @@ object BitcoinSExample {
     targetNode.appendChild(parNode)
   }
 
-  @JSExportTopLevel("generateAddress")
-  def generateAddress(): Unit = {
-    val privKey = ECPrivateKey.freshPrivateKey
-    val publicKey =  privKey.publicKey
-    val network = TestNet3
-    val p2wpkh = P2WPKHWitnessSPKV0(publicKey)
-    val addr = Bech32Address.fromScriptPubKey(p2wpkh,network)
-    appendPar(document.body, s"privKey=${privKey.hex}")
-    appendPar(document.body, s"pubKey=${publicKey.hex}")
-    appendPar(document.body, s"p2wpkh=${p2wpkh.asmBytes}")
-    appendPar(document.body, s"network=$network")
-    appendPar(document.body,s"addr=${addr.toString()}")
+  @JSExportTopLevel("generateDescriptor")
+  def generateDescriptor(
+      individualCollateralText: Input,
+      totalCollateralText: Input,
+      premiumText: Input,
+      numDigitsText: Input,
+      strikePriceText: Input,
+      resultArea: Element): Unit = {
+    println("generateDescriptor")
+    val individualCollateral = Satoshis(individualCollateralText.value.toLong)
+    val totalCollateral = Satoshis(totalCollateralText.value.toLong)
+    val premium = Satoshis(premiumText.value.toLong)
+    val numDigits = numDigitsText.value.toInt
+    val strikePrice = strikePriceText.value.toLong
+
+    val template: CallOption = CallOption(individualCollateral,
+                              totalCollateral,
+                              numDigits,
+                              strikePrice,
+                              premium,
+                              RoundingIntervals.noRounding)
+
+    println(template.toContractDescriptor.hex)
+
+    resultArea.textContent = template.toContractDescriptor.hex
   }
 
 }
